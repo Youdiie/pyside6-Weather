@@ -1,11 +1,14 @@
 import datetime, requests, json
+from PySide6.QtCore import QAbstractItemModel
 from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 
 cities = ["Seoul,KR", "Tokyo,JP", "LasVegas,US"]
 
 
-class Model:
+class Model(QAbstractItemModel):
     def __init__(self, city):
+        super().__init__()
         self.city = city
         self.vilage_weather_url = (
             "http://api.openweathermap.org/data/2.5/weather?q={},uk&APPID=".format(
@@ -27,6 +30,13 @@ class Model:
         }
         return data_dic
 
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            return self.items[index.row()]
+
+    def rowCount(self, index):
+        return len(self.items)
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -35,7 +45,7 @@ class MainWindow(QMainWindow):
         self.city = cities[0]
         self.model = Model(self.city)
         self.weather = str(self.model.get_weather_data())
-        print(self.weather)
+
         self.setWindowTitle("오늘의 날씨")
 
         layout = QHBoxLayout()
@@ -47,13 +57,15 @@ class MainWindow(QMainWindow):
         self.tokyo_button = QPushButton("도쿄")
         self.lasvegas_button = QPushButton("라스베가스")
 
+        self.weather_label = QLabel(self.weather)
+
         self.seoul_button.pressed.connect(self.seoul)
         self.tokyo_button.pressed.connect(self.tokyo)
         self.lasvegas_button.pressed.connect(self.lasvegas)
 
         layout.addLayout(layout_left)
         layout.addLayout(layout_right)
-        layout_left.addWidget(QLabel(self.weather))
+        layout_left.addWidget(self.weather_label)
         layout_right.addWidget(self.label)
         layout_right.addWidget(self.seoul_button)
         layout_right.addWidget(self.tokyo_button)
@@ -65,11 +77,12 @@ class MainWindow(QMainWindow):
 
     def seoul(self):
         self.city = cities[0]
-        # self.city가 바꼈음을 emit해줘야함!
-        self.model.stringChanged.emit()
 
     def tokyo(self):
         self.city = cities[1]
+        # self.city가 바꼈음을 emit해줘야함!
+        self.weather_label.setText(self.weather)
+        self.model.layoutChanged.emit()
 
     def lasvegas(self):
         self.city = cities[2]
