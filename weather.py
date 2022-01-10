@@ -1,24 +1,23 @@
 import datetime, requests, json
-from PySide6.QtCore import QAbstractItemModel
+from PySide6.QtCore import QAbstractItemModel, QObject, Signal
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 
 cities = ["Seoul,KR", "Tokyo,JP", "LasVegas,US"]
 
 
-class Model(QAbstractItemModel):
-    def __init__(self, city):
+class Model(QObject):
+    dataChanged = Signal(dict)
+
+    def __init__(self):
         super().__init__()
-        self.city = city
-        self.vilage_weather_url = (
-            "http://api.openweathermap.org/data/2.5/weather?q={},uk&APPID=".format(
-                self.city
-            )
-        )
         self.service_key = "208bc12659b6799741f2f19621c985d9"
 
-    def get_weather_data(self):
-        res = requests.get(self.vilage_weather_url + self.service_key)
+    def get_weather_data(self, city):
+        def get_vilage_weather_url(city):
+            return f"http://api.openweathermap.org/data/2.5/weather?q={city},uk&APPID="
+
+        res = requests.get(get_vilage_weather_url(city) + self.service_key)
         data = json.loads(res.text)
         data_dic = {
             "도시": data["name"],
@@ -30,12 +29,9 @@ class Model(QAbstractItemModel):
         }
         return data_dic
 
-    def data(self, index, role):
-        if role == Qt.DisplayRole:
-            return self.items[index.row()]
-
-    def rowCount(self, index):
-        return len(self.items)
+    def update_weather_data(self, city):
+        update_data_dic = self.get_weather_data(city)
+        self.dataChanged.emit(update_data_dic)
 
 
 class MainWindow(QMainWindow):
@@ -43,8 +39,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.city = cities[0]
-        self.model = Model(self.city)
-        self.weather = str(self.model.get_weather_data())
+        self.model = Model()
 
         self.setWindowTitle("오늘의 날씨")
 
@@ -57,11 +52,12 @@ class MainWindow(QMainWindow):
         self.tokyo_button = QPushButton("도쿄")
         self.lasvegas_button = QPushButton("라스베가스")
 
-        self.weather_label = QLabel(self.weather)
+        self.weather_label = QLabel("Click Button!")
 
         self.seoul_button.pressed.connect(self.seoul)
         self.tokyo_button.pressed.connect(self.tokyo)
         self.lasvegas_button.pressed.connect(self.lasvegas)
+        self.model.dataChanged.connect(self.update_weather)
 
         layout.addLayout(layout_left)
         layout.addLayout(layout_right)
@@ -75,17 +71,20 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
+    def update_weather(self, weather_data):
+        self.weather_label.setText(str(weather_data))
+
     def seoul(self):
         self.city = cities[0]
+        self.model.update_weather_data(self.city)
 
     def tokyo(self):
         self.city = cities[1]
-        # self.city가 바꼈음을 emit해줘야함!
-        self.weather_label.setText(self.weather)
-        self.model.layoutChanged.emit()
+        self.model.update_weather_data(self.city)
 
     def lasvegas(self):
         self.city = cities[2]
+        self.model.update_weather_data(self.city)
 
 
 app = QApplication()
