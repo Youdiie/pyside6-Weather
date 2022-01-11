@@ -7,7 +7,7 @@ cities = ["Seoul,KR", "Tokyo,JP", "LasVegas,US"]
 
 
 class Model(QObject):
-    dataChanged = Signal(dict)
+    dataChanged = Signal(list)
 
     def __init__(self):
         super().__init__()
@@ -19,19 +19,19 @@ class Model(QObject):
 
         res = requests.get(get_vilage_weather_url(city) + self.service_key)
         data = json.loads(res.text)
-        data_dic = {
-            "도시": data["name"],
-            "날씨": data["weather"][0]["description"],
-            "최저기온": round(data["main"]["temp_min"] - 273, 2),
-            "최고기온": round(data["main"]["temp_max"] - 273, 2),
-            "습도": data["main"]["humidity"],
-            "풍속": data["wind"]["speed"],
-        }
-        return data_dic
+        data_list = [
+            data["name"],
+            data["weather"][0]["description"],
+            round(data["main"]["temp_min"] - 273, 2),
+            round(data["main"]["temp_max"] - 273, 2),
+            data["main"]["humidity"],
+            data["wind"]["speed"],
+        ]
+        return data_list
 
     def update_weather_data(self, city):
-        update_data_dic = self.get_weather_data(city)
-        self.dataChanged.emit(update_data_dic)
+        update_data_list = self.get_weather_data(city)
+        self.dataChanged.emit(update_data_list)
 
 
 class MainWindow(QMainWindow):
@@ -116,7 +116,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def update_weather(self, weather_data):
-        pass
+        for i in range(6):
+            getattr(self, f"weather_{i+1}_item").setText(str(weather_data[i]))
 
     def seoul(self):
         self.city = cities[0]
