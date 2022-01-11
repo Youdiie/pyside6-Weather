@@ -68,8 +68,11 @@ class MainWindow(QMainWindow):
         self.layout_left_weather_1.addWidget(self.weather_1_item)
         layout_left.addLayout(self.layout_left_weather_1)
         self.layout_left_weather_2.addWidget(self.weather_2_title)
+        self.weather_2_title.setFixedSize(QSize(30, 20))
         self.layout_left_weather_2.addWidget(self.weather_2_icon)
+        self.layout_left_weather_2.addSpacerItem(QSpacerItem(50, 20))
         self.layout_left_weather_2.addWidget(self.weather_2_item)
+        self.weather_2_icon.setFixedSize(QSize(20, 20))
         layout_left.addLayout(self.layout_left_weather_2)
         self.layout_left_weather_3.addWidget(self.weather_3_title)
         self.layout_left_weather_3.addWidget(self.weather_3_item)
@@ -95,7 +98,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def update_weather(self, weather_data):
-        print(weather_data)
         # for i in range(6):
         #     getattr(self, f"weather_{i+1}_item").setText(str(weather_data[i]))
         def get_weather_icon(weather):
@@ -117,7 +119,6 @@ class MainWindow(QMainWindow):
                 return QPixmap(weather_icon)
 
         self.weather_1_item.setText(str(weather_data[0]))
-        self.weather_2_icon.setFixedSize(QSize(20, 20))
         self.weather_2_icon.setPixmap(get_weather_icon(str(weather_data[1])))
         self.weather_2_icon.setScaledContents(True)
         self.weather_2_item.setText(str(weather_data[1]))
@@ -151,6 +152,11 @@ class MainWindow(QMainWindow):
 
 
 app = QApplication()
+palette = QPalette()
+palette.setColor(QPalette.Window, QColor(0, 128, 255))
+palette.setColor(QPalette.WindowText, Qt.white)
+app.setPalette(palette)
+
 window = MainWindow()
 window.show()
 app.exec()
