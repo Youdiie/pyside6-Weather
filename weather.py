@@ -112,20 +112,21 @@ class MainWindow(QMainWindow):
                 weather_icon = icon_cloudy
             elif "rain" in weather:
                 weather_icon = icon_rainy
-            elif "mist" in weather:
-                weather_icon = icon_mist
+            # elif "mist" in weather:
+            #     weather_icon = icon_mist
 
-            if weather_icon:
-                return QPixmap(weather_icon)
+            return QPixmap() if not weather_icon else QPixmap(weather_icon)
 
         self.weather_1_item.setText(str(weather_data[0]))
-        self.weather_2_icon.setPixmap(get_weather_icon(str(weather_data[1])))
-        self.weather_2_icon.setScaledContents(True)
         self.weather_2_item.setText(str(weather_data[1]))
         self.weather_3_item.setText(str(weather_data[2]))
         self.weather_4_item.setText(str(weather_data[3]))
         self.weather_5_item.setText(str(weather_data[4]))
         self.weather_6_item.setText(str(weather_data[5]))
+
+        self.weather_2_icon.setPixmap(get_weather_icon(str(weather_data[1])))
+        # self.weather_2_icon.setPixmap()
+        self.weather_2_icon.setScaledContents(True)
 
     def setup_handlers(self):
         def seoul():
