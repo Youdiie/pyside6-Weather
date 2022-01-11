@@ -52,7 +52,25 @@ class MainWindow(QMainWindow):
         self.tokyo_button = QPushButton("도쿄")
         self.lasvegas_button = QPushButton("라스베가스")
 
-        self.weather_label = QLabel("Click Button!")
+        weather_label = QLabel("Click Button!")
+        self.layout_left_weather_1 = QHBoxLayout()
+        self.layout_left_weather_2 = QHBoxLayout()
+        self.layout_left_weather_3 = QHBoxLayout()
+        self.layout_left_weather_4 = QHBoxLayout()
+        self.layout_left_weather_5 = QHBoxLayout()
+        self.layout_left_weather_6 = QHBoxLayout()
+        self.weather_1_title = QLabel("도시")
+        self.weather_1_item = QLabel()
+        self.weather_2_title = QLabel("날씨")
+        self.weather_2_item = QLabel()
+        self.weather_3_title = QLabel("최저기온")
+        self.weather_3_item = QLabel()
+        self.weather_4_title = QLabel("최고기온")
+        self.weather_4_item = QLabel()
+        self.weather_5_title = QLabel("습도")
+        self.weather_5_item = QLabel()
+        self.weather_6_title = QLabel("풍속")
+        self.weather_6_item = QLabel()
 
         self.seoul_button.pressed.connect(self.seoul)
         self.tokyo_button.pressed.connect(self.tokyo)
@@ -61,7 +79,33 @@ class MainWindow(QMainWindow):
 
         layout.addLayout(layout_left)
         layout.addLayout(layout_right)
-        layout_left.addWidget(self.weather_label)
+        layout_left.addWidget(weather_label)
+
+        for i in range(1, 7):
+            getattr(self, f"layout_left_weather_{i}").addWidget(
+                getattr(self, f"weather_{i}_title")
+            )
+            getattr(self, f"layout_left_weather_{i}").addWidget(
+                getattr(self, f"weather_{i}_item")
+            )
+            layout_left.addLayout(getattr(self, f"layout_left_weather_{i}"))
+
+        # layout_left_weather_2.addWidget(self.weather_2_title)
+        # layout_left_weather_2.addWidget(self.weather_2_item)
+        # layout_left.addLayout(layout_left_weather_2)
+        # layout_left_weather_3.addWidget(self.weather_3_title)
+        # layout_left_weather_3.addWidget(self.weather_3_item)
+        # layout_left.addLayout(layout_left_weather_3)
+        # layout_left_weather_4.addWidget(self.weather_4_title)
+        # layout_left_weather_4.addWidget(self.weather_4_item)
+        # layout_left.addLayout(layout_left_weather_4)
+        # layout_left_weather_5.addWidget(self.weather_5_title)
+        # layout_left_weather_5.addWidget(self.weather_5_item)
+        # layout_left.addLayout(layout_left_weather_5)
+        # layout_left_weather_6.addWidget(self.weather_6_title)
+        # layout_left_weather_6.addWidget(self.weather_6_item)
+        # layout_left.addLayout(layout_left_weather_6)
+
         layout_right.addWidget(self.label)
         layout_right.addWidget(self.seoul_button)
         layout_right.addWidget(self.tokyo_button)
@@ -72,7 +116,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def update_weather(self, weather_data):
-        self.weather_label.setText(str(weather_data))
+        pass
 
     def seoul(self):
         self.city = cities[0]
