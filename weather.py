@@ -6,6 +6,32 @@ from PySide6.QtCore import *
 from model import *
 
 
+class PairItem(QHBoxLayout):
+    """layout_left에 들어가는 layout 3개 모아놓은 class"""
+
+    def __init__(self, title, use_icon=False):
+        super().__init__()
+
+        self.title_widget = QLabel(title)
+        self.icon_widget = QLabel()
+        self.icon_widget.setFixedSize(QSize(20, 20))
+        self.content_widget = QLabel()
+        self.addWidget(self.title_widget)
+        if use_icon:
+            self.addWidget(self.icon_widget)
+        self.addWidget(self.content_widget)
+
+    def change_content(self, content):
+        self.content_widget.setText(content)
+
+    def update_icon(self, icon_path):
+        if icon_path:
+            self.icon_widget.setPixmap(QPixmap(icon_path))
+        else:
+            self.icon_widget.setPixmap(QPixmap())
+        self.icon_widget.setScaledContents(True)
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -13,7 +39,7 @@ class MainWindow(QMainWindow):
             "Seoul,KR": QPushButton("서울"),
             "Tokyo,JP": QPushButton("도쿄"),
             "LasVegas,US": QPushButton("라스베가스"),
-            "LA,US": QPushButton("LA"),
+            "LA,US": QPushButton("엘에이"),
             "London": QPushButton("런던"),
             "Paris,France": QPushButton("파리"),
         }
@@ -25,25 +51,12 @@ class MainWindow(QMainWindow):
 
     def setup_widgets(self):
 
-        self.layout_left_city = QHBoxLayout()
-        self.layout_left_date = QHBoxLayout()
-        self.layout_left_min_temp = QHBoxLayout()
-        self.layout_left_max_temp = QHBoxLayout()
-        self.layout_left_humidity = QHBoxLayout()
-        self.layout_left_wind = QHBoxLayout()
-        self.weather_1_title = QLabel("도시")
-        self.weather_1_item = QLabel()
-        self.weather_2_title = QLabel("날씨")
-        self.weather_2_icon = QLabel()
-        self.weather_2_item = QLabel()
-        self.weather_3_title = QLabel("최저기온")
-        self.weather_3_item = QLabel()
-        self.weather_4_title = QLabel("최고기온")
-        self.weather_4_item = QLabel()
-        self.weather_5_title = QLabel("습도")
-        self.weather_5_item = QLabel()
-        self.weather_6_title = QLabel("풍속")
-        self.weather_6_item = QLabel()
+        self.pairitem_city = PairItem("도시")
+        self.pairitem_weather = PairItem("날씨", use_icon=True)
+        self.pairitem_min_temp = PairItem("최저기온")
+        self.pairitem_max_temp = PairItem("최고기온")
+        self.pairitem_humidity = PairItem("습도")
+        self.pairitem_wind = PairItem("풍속")
 
     def setup_layout(self):
 
@@ -57,28 +70,12 @@ class MainWindow(QMainWindow):
         layout.addWidget(widget_left)
         layout.addLayout(layout_right)
 
-        self.layout_left_city.addWidget(self.weather_1_title)
-        self.layout_left_city.addWidget(self.weather_1_item)
-        layout_left.addLayout(self.layout_left_city)
-        self.layout_left_date.addWidget(self.weather_2_title)
-        self.weather_2_title.setFixedSize(QSize(30, 20))
-        self.layout_left_date.addWidget(self.weather_2_icon)
-        self.layout_left_date.addSpacerItem(QSpacerItem(50, 20))
-        self.layout_left_date.addWidget(self.weather_2_item)
-        self.weather_2_icon.setFixedSize(QSize(20, 20))
-        layout_left.addLayout(self.layout_left_date)
-        self.layout_left_min_temp.addWidget(self.weather_3_title)
-        self.layout_left_min_temp.addWidget(self.weather_3_item)
-        layout_left.addLayout(self.layout_left_min_temp)
-        self.layout_left_max_temp.addWidget(self.weather_4_title)
-        self.layout_left_max_temp.addWidget(self.weather_4_item)
-        layout_left.addLayout(self.layout_left_max_temp)
-        self.layout_left_humidity.addWidget(self.weather_5_title)
-        self.layout_left_humidity.addWidget(self.weather_5_item)
-        layout_left.addLayout(self.layout_left_humidity)
-        self.layout_left_wind.addWidget(self.weather_6_title)
-        self.layout_left_wind.addWidget(self.weather_6_item)
-        layout_left.addLayout(self.layout_left_wind)
+        layout_left.addLayout(self.pairitem_city)
+        layout_left.addLayout(self.pairitem_weather)
+        layout_left.addLayout(self.pairitem_min_temp)
+        layout_left.addLayout(self.pairitem_max_temp)
+        layout_left.addLayout(self.pairitem_humidity)
+        layout_left.addLayout(self.pairitem_wind)
 
         for city, city_button in self.city_buttons.items():
             layout_right.addWidget(city_button)
@@ -103,23 +100,21 @@ class MainWindow(QMainWindow):
             elif "mist" in weather:
                 weather_icon = icon_mist
 
-            return QPixmap() if not weather_icon else QPixmap(weather_icon)
+            return weather_icon
 
-        self.weather_1_item.setText(str(weather_data[0]))
-        self.weather_2_item.setText(str(weather_data[1]))
-        self.weather_3_item.setText(str(weather_data[2]))
-        self.weather_4_item.setText(str(weather_data[3]))
-        self.weather_5_item.setText(str(weather_data[4]))
-        self.weather_6_item.setText(str(weather_data[5]))
-
-        self.weather_2_icon.setPixmap(get_weather_icon(str(weather_data[1])))
-        # self.weather_2_icon.setPixmap()
-        self.weather_2_icon.setScaledContents(True)
+        self.pairitem_weather.update_icon(get_weather_icon(str(weather_data[1])))
+        self.pairitem_city.change_content(str(weather_data[0]))
+        self.pairitem_weather.change_content(str(weather_data[1]))
+        self.pairitem_min_temp.change_content(str(weather_data[2]))
+        self.pairitem_max_temp.change_content(str(weather_data[3]))
+        self.pairitem_humidity.change_content(str(weather_data[4]))
+        self.pairitem_wind.change_content(str(weather_data[5]))
 
     def setup_handlers(self):
 
         for city, city_button in self.city_buttons.items():
             city_button.pressed.connect(partial(self.model.update_weather_data, city))
+
         self.model.dataChanged.connect(self.update_weather)
 
 
