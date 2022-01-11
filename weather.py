@@ -44,6 +44,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("오늘의 날씨")
 
         layout = QHBoxLayout()
+        widget_left = QWidget()
+        widget_left.setFixedSize(250, 200)
         layout_left = QVBoxLayout()
         layout_right = QVBoxLayout()
 
@@ -52,7 +54,6 @@ class MainWindow(QMainWindow):
         self.tokyo_button = QPushButton("도쿄")
         self.lasvegas_button = QPushButton("라스베가스")
 
-        weather_label = QLabel("Click Button!")
         self.layout_left_weather_1 = QHBoxLayout()
         self.layout_left_weather_2 = QHBoxLayout()
         self.layout_left_weather_3 = QHBoxLayout()
@@ -77,9 +78,9 @@ class MainWindow(QMainWindow):
         self.lasvegas_button.pressed.connect(self.lasvegas)
         self.model.dataChanged.connect(self.update_weather)
 
-        layout.addLayout(layout_left)
+        widget_left.setLayout(layout_left)
+        layout.addWidget(widget_left)
         layout.addLayout(layout_right)
-        layout_left.addWidget(weather_label)
 
         for i in range(1, 7):
             getattr(self, f"layout_left_weather_{i}").addWidget(
