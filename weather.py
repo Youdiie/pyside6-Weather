@@ -24,7 +24,7 @@ class PairItem:
 
     def setup_layout(self, use_icon):
         if use_icon:
-            # self.title_widget.setFixedSize(QSize(40, 20))
+            self.title_widget.setFixedSize(QSize(40, 20))
             self.title_layout.addWidget(self.title_widget)
             self.title_layout.addWidget(self.icon_widget)
         else:
@@ -69,6 +69,14 @@ class MainWindow(QMainWindow):
         self.pairitem_max_temp = PairItem("최고기온")
         self.pairitem_humidity = PairItem("습도")
         self.pairitem_wind = PairItem("풍속")
+        self.pairitems = [
+            self.pairitem_city,
+            self.pairitem_weather,
+            self.pairitem_min_temp,
+            self.pairitem_max_temp,
+            self.pairitem_humidity,
+            self.pairitem_wind,
+        ]
 
     def setup_layout(self):
 
@@ -82,18 +90,9 @@ class MainWindow(QMainWindow):
         layout.addWidget(widget_left)
         layout.addLayout(layout_right)
 
-        layout_left.addLayout(self.pairitem_city.title_layout, 0, 0)
-        layout_left.addLayout(self.pairitem_city.content_layout, 0, 1)
-        layout_left.addLayout(self.pairitem_weather.title_layout, 1, 0)
-        layout_left.addLayout(self.pairitem_weather.content_layout, 1, 1)
-        layout_left.addLayout(self.pairitem_min_temp.title_layout, 2, 0)
-        layout_left.addLayout(self.pairitem_min_temp.content_layout, 2, 1)
-        layout_left.addLayout(self.pairitem_max_temp.title_layout, 3, 0)
-        layout_left.addLayout(self.pairitem_max_temp.content_layout, 3, 1)
-        layout_left.addLayout(self.pairitem_humidity.title_layout, 4, 0)
-        layout_left.addLayout(self.pairitem_humidity.content_layout, 4, 1)
-        layout_left.addLayout(self.pairitem_wind.title_layout, 5, 0)
-        layout_left.addLayout(self.pairitem_wind.content_layout, 5, 1)
+        for i, pairitem in enumerate(self.pairitems):
+            layout_left.addLayout(pairitem.title_layout, i, 0)
+            layout_left.addLayout(pairitem.content_layout, i, 1)
 
         for city, city_button in self.city_buttons.items():
             layout_right.addWidget(city_button)
