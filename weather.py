@@ -6,20 +6,24 @@ from PySide6.QtCore import *
 from model import *
 
 
-class PairItem(QHBoxLayout):
+class PairItem(QGridLayout):
     """layout_left에 들어가는 layout 3개 모아놓은 class"""
 
     def __init__(self, title, use_icon=False):
         super().__init__()
 
         self.title_widget = QLabel(title)
+        layout = QHBoxLayout()
         self.icon_widget = QLabel()
         self.icon_widget.setFixedSize(QSize(20, 20))
         self.content_widget = QLabel()
-        self.addWidget(self.title_widget)
         if use_icon:
-            self.addWidget(self.icon_widget)
-        self.addWidget(self.content_widget)
+            layout.addWidget(self.title_widget)
+            layout.addWidget(self.icon_widget)
+            self.addLayout(layout, 0, 0)
+        else:
+            self.addWidget(self.title_widget, 0, 0)
+        self.addWidget(self.content_widget, 0, 1)
 
     def change_content(self, content):
         self.content_widget.setText(content)
@@ -43,6 +47,8 @@ class MainWindow(QMainWindow):
             "London": QPushButton("런던"),
             "Paris,France": QPushButton("파리"),
         }
+        for city, city_button in self.city_buttons.items():
+            city_button.autoDefault()
         self.model = Model()
         self.setWindowTitle("오늘의 날씨")
         self.setup_widgets()
@@ -62,7 +68,7 @@ class MainWindow(QMainWindow):
 
         layout = QHBoxLayout()
         widget_left = QWidget()
-        widget_left.setFixedSize(300, 200)
+        widget_left.setFixedSize(200, 200)
         layout_left = QVBoxLayout()
         layout_right = QVBoxLayout()
 
