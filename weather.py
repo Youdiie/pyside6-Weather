@@ -6,24 +6,30 @@ from PySide6.QtCore import *
 from model import *
 
 
-class PairItem(QGridLayout):
+class PairItem:
     """layout_left에 들어가는 layout 3개 모아놓은 class"""
 
     def __init__(self, title, use_icon=False):
-        super().__init__()
+        self.setup_widgets(title)
+        self.setup_layout(use_icon)
 
+    def setup_widgets(self, title):
+
+        self.title_layout = QHBoxLayout()
+        self.content_layout = QHBoxLayout()
         self.title_widget = QLabel(title)
-        layout = QHBoxLayout()
         self.icon_widget = QLabel()
         self.icon_widget.setFixedSize(QSize(20, 20))
         self.content_widget = QLabel()
+
+    def setup_layout(self, use_icon):
         if use_icon:
-            layout.addWidget(self.title_widget)
-            layout.addWidget(self.icon_widget)
-            self.addLayout(layout, 0, 0)
+            # self.title_widget.setFixedSize(QSize(40, 20))
+            self.title_layout.addWidget(self.title_widget)
+            self.title_layout.addWidget(self.icon_widget)
         else:
-            self.addWidget(self.title_widget, 0, 0)
-        self.addWidget(self.content_widget, 0, 1)
+            self.title_layout.addWidget(self.title_widget)
+        self.content_layout.addWidget(self.content_widget)
 
     def change_content(self, content):
         self.content_widget.setText(content)
@@ -69,19 +75,25 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         widget_left = QWidget()
         widget_left.setFixedSize(200, 200)
-        layout_left = QVBoxLayout()
+        layout_left = QGridLayout()
         layout_right = QVBoxLayout()
 
         widget_left.setLayout(layout_left)
         layout.addWidget(widget_left)
         layout.addLayout(layout_right)
 
-        layout_left.addLayout(self.pairitem_city)
-        layout_left.addLayout(self.pairitem_weather)
-        layout_left.addLayout(self.pairitem_min_temp)
-        layout_left.addLayout(self.pairitem_max_temp)
-        layout_left.addLayout(self.pairitem_humidity)
-        layout_left.addLayout(self.pairitem_wind)
+        layout_left.addLayout(self.pairitem_city.title_layout, 0, 0)
+        layout_left.addLayout(self.pairitem_city.content_layout, 0, 1)
+        layout_left.addLayout(self.pairitem_weather.title_layout, 1, 0)
+        layout_left.addLayout(self.pairitem_weather.content_layout, 1, 1)
+        layout_left.addLayout(self.pairitem_min_temp.title_layout, 2, 0)
+        layout_left.addLayout(self.pairitem_min_temp.content_layout, 2, 1)
+        layout_left.addLayout(self.pairitem_max_temp.title_layout, 3, 0)
+        layout_left.addLayout(self.pairitem_max_temp.content_layout, 3, 1)
+        layout_left.addLayout(self.pairitem_humidity.title_layout, 4, 0)
+        layout_left.addLayout(self.pairitem_humidity.content_layout, 4, 1)
+        layout_left.addLayout(self.pairitem_wind.title_layout, 5, 0)
+        layout_left.addLayout(self.pairitem_wind.content_layout, 5, 1)
 
         for city, city_button in self.city_buttons.items():
             layout_right.addWidget(city_button)
