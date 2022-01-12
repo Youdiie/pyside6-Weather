@@ -10,36 +10,40 @@ class PairItem:
     """layout_left에 들어가는 layout 3개 모아놓은 class"""
 
     def __init__(self, title, use_icon=False):
-        self.setup_widgets(title)
-        self.setup_layout(use_icon)
+        self._setup_widgets(title)
+        self._setup_layout(use_icon)
 
-    def setup_widgets(self, title):
-
-        self.title_layout = QHBoxLayout()
-        self.content_layout = QHBoxLayout()
-        self.title_widget = QLabel(title)
-        self.icon_widget = QLabel()
-        self.icon_widget.setFixedSize(QSize(20, 20))
-        self.content_widget = QLabel()
-
-    def setup_layout(self, use_icon):
-        if use_icon:
-            self.title_widget.setFixedSize(QSize(40, 20))
-            self.title_layout.addWidget(self.title_widget)
-            self.title_layout.addWidget(self.icon_widget)
-        else:
-            self.title_layout.addWidget(self.title_widget)
-        self.content_layout.addWidget(self.content_widget)
-
+    # 노출시키는건 위에(__init__다음에)
     def change_content(self, content):
-        self.content_widget.setText(content)
+        self._content_widget.setText(content)
 
     def update_icon(self, icon_path):
         if icon_path:
-            self.icon_widget.setPixmap(QPixmap(icon_path))
+            self._icon_widget.setPixmap(QPixmap(icon_path))
         else:
-            self.icon_widget.setPixmap(QPixmap())
-        self.icon_widget.setScaledContents(True)
+            self._icon_widget.setPixmap(QPixmap())
+        self._icon_widget.setScaledContents(True)
+
+    # 숨길자료(함수,변수)는 아래에(_언더바로 표시)
+    def _setup_widgets(self, title):
+
+        self.title_layout = QHBoxLayout()
+        self.content_layout = QHBoxLayout()
+
+        # 모르는게 더 좋은 자료 : 구현 세부사항 -> 밖에서 몰라야함!
+        self._title_widget = QLabel(title)
+        self._icon_widget = QLabel()
+        self._icon_widget.setFixedSize(QSize(20, 20))
+        self._content_widget = QLabel()
+
+    def _setup_layout(self, use_icon):
+        if use_icon:
+            self._title_widget.setFixedSize(QSize(40, 20))
+            self.title_layout.addWidget(self._title_widget)
+            self.title_layout.addWidget(self._icon_widget)
+        else:
+            self.title_layout.addWidget(self._title_widget)
+        self.content_layout.addWidget(self._content_widget)
 
 
 class MainWindow(QMainWindow):
@@ -57,18 +61,21 @@ class MainWindow(QMainWindow):
             city_button.autoDefault()
         self.model = Model()
         self.setWindowTitle("오늘의 날씨")
-        self.setup_widgets()
-        self.setup_layout()
-        self.setup_handlers()
+        self._setup_widgets()
+        self._setup_layout()
+        self._setup_handlers()
 
-    def setup_widgets(self):
+    def _setup_widgets(self):
 
+        # 정보를 받아오는 영역
         self.pairitem_city = PairItem("도시")
         self.pairitem_weather = PairItem("날씨", use_icon=True)
         self.pairitem_min_temp = PairItem("최저기온")
         self.pairitem_max_temp = PairItem("최고기온")
         self.pairitem_humidity = PairItem("습도")
         self.pairitem_wind = PairItem("풍속")
+
+        # 정보를 그리는 순서
         self.pairitems = [
             self.pairitem_city,
             self.pairitem_weather,
@@ -78,7 +85,7 @@ class MainWindow(QMainWindow):
             self.pairitem_wind,
         ]
 
-    def setup_layout(self):
+    def _setup_layout(self):
 
         layout = QHBoxLayout()
         widget_left = QWidget()
@@ -101,7 +108,7 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
-    def update_weather(self, weather_data):
+    def _update_weather(self, weather_data):
         def get_weather_icon(weather):
             weather_icon = ""
             icon_cloudy = "./icon/weather-2191838-1846632.webp"
@@ -127,12 +134,12 @@ class MainWindow(QMainWindow):
         self.pairitem_humidity.change_content(str(weather_data[4]))
         self.pairitem_wind.change_content(str(weather_data[5]))
 
-    def setup_handlers(self):
+    def _setup_handlers(self):
 
         for city, city_button in self.city_buttons.items():
             city_button.pressed.connect(partial(self.model.update_weather_data, city))
 
-        self.model.dataChanged.connect(self.update_weather)
+        self.model.dataChanged.connect(self._update_weather)
 
 
 app = QApplication()
